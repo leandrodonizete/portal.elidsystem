@@ -1,0 +1,23 @@
+# portal.elidsystem.com.br — tudo vai para o repassador (index.php), que
+# encaminha ao sistema em frota.elidsystem.com.br. Nada é servido daqui.
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # O token do Desktop/app (Authorization) chega ao PHP.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{REQUEST_URI} !^/index\.php$
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# O arquivo enviado (multipart) segue cru para o sistema, sem o PHP daqui ler.
+<IfModule mod_php.c>
+    php_flag enable_post_data_reading Off
+    php_value max_execution_time 300
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag enable_post_data_reading Off
+    php_value max_execution_time 300
+</IfModule>
